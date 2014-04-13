@@ -1,4 +1,7 @@
 $( document ).ready(function() {
+	
+	var maxEvents = 5;
+
 	var MONTHS = ["January", "February", "March", "April", "May", "June", 
 								"July", "August", "September", "October", "November", 
 								"December"];
@@ -44,12 +47,12 @@ $( document ).ready(function() {
 	var e8Description = "11am - 1pm at SMC Quad" + "<br>" + 
 	"Make your own kingdom's flag, cloth and sewing machines will be provided.";
 
-	var e9 = new Date("February 28, 2014");
+	var e9 = new Date("April 14, 2014");
 	var e9Title = "Medieval Trivia";
 	var e9Description = "12pm - 2pm at The Coop(in Brennan Hall)" + "<br>" + 
 	"Think you know Medievalism well? Put your knowledge to the test!";
 
-	var e10 = new Date("March 3, 2014");
+	var e10 = new Date("April 10, 2014");
 	var e10Title = "Bruno Perrier Seminar";
 	var e10Description = "11am - 2pm at Father Madden Hall(in Carr Hall)" + "<br>" + 
 	"Bruno Perrier, the renowned Medieval furniture expert will be giving a seminar on Scottish King's furniture.";
@@ -61,13 +64,31 @@ $( document ).ready(function() {
 		[e8, e8Title, e8Description], [e9, e9Title, e9Description], 
 		[e10, e10Title, e10Description]];
 
-	eventsList = eventsList.sort(function(a, b) {return a-b});
+	// Sorting the eventsList, using a form of insertion sort.
+	for (var i = 0; i < eventsList.length; i++) {
+		var replacement = eventsList[i];
+		var comparison = eventsList[i][0].valueOf();
+		var j = i;
+		while ((j > 0) && (eventsList[j - 1][0].valueOf() > comparison)) {
+			eventsList[j] = eventsList[j - 1];
+			j--;
+		}
+		eventsList[j] = replacement;
+
+		// This is for thee next if statement.
+		var lastIndex = i;
+	}
 
 	var today = new Date();
 	today.setHours(00);
 	today.setMinutes(00);
 	today.setSeconds(00);
 	today.setMilliseconds(000);
+
+	// Empties the list if there are no current events.
+	if (today > eventsList[lastIndex][0]) {
+		eventsList = [];
+	}
 	// Breaks the list according to the most current event.
 	for (var i = 0; i < eventsList.length; i++) {
 		if (today <= eventsList[i][0]) {
@@ -76,11 +97,13 @@ $( document ).ready(function() {
 		}
 	}
 
+	// Making a counter that is 5 or less depending on how many relevant events 
+	// are in the list.
 	var counter = 0;
-	if (eventsList.length <= 4) {
+	if (eventsList.length < maxEvents) {
 		counter = eventsList.length;
 	} else {
-		counter = 5;
+		counter = maxEvents;
 	}
 
 	var events = "";
@@ -90,5 +113,9 @@ $( document ).ready(function() {
 			eventsList[i][0].getDate() + "  -  " + eventsList[i][1] + "</h2><p>" + 
 			eventsList[i][2] + "</p>";
 	}
+	if (counter == 0) {
+		events += "<h2 style='text-align:center'>Coming Soon</h2>";
+	}
+
 	$("#events-box").append(events);
 });
